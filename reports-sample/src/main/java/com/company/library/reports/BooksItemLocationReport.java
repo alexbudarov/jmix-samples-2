@@ -2,10 +2,11 @@ package com.company.library.reports;
 
 import com.company.library.entity.BookInstance;
 import com.company.library.reports.annotation.*;
-import com.company.library.reports.api.*;
-import io.jmix.core.DataManager;
-import io.jmix.core.Messages;
+import com.company.library.reports.api.ErrorConsumer;
+import io.jmix.core.*;
 import io.jmix.core.querycondition.PropertyCondition;
+import io.jmix.reports.entity.DataSetType;
+import io.jmix.reports.entity.Orientation;
 import io.jmix.reports.entity.ParameterType;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -49,8 +50,41 @@ public interface BooksItemLocationReport {
                         .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 155L))
                         .one(),
                 dataManager.load(BookInstance.class)
-                        .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL,487L))
+                        .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 487L))
                         .one()
         );
+    }
+
+    // maybe make implicit?
+    @BandDef(name = BandDef.ROOT, root = true, orientation = Orientation.HORIZONTAL)
+    void rootBand();
+
+    @BandDef(name = "headerBookInstances", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    void headerBookInstancesBand();
+
+    @BandDef(name = "BookInstances", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @DataSetDef(
+            name = "BookInstances",
+            type = DataSetType.MULTI,
+            entity = @EntityDataSetParameters(
+                    listParameterAlias = "entities",
+                    fetchPlan = {"bookPublication.book.name", "libraryDepartment.name"} // OR variant like below
+            )
+    )
+    void bookInstancesBand();
+
+    @DataSetFetchPlan(name = "BookInstances")
+    // @SupplyAttribute(target = "BookInstances", attribute = "fetchPlan")
+    default FetchPlan bookInstancesFetchPlan(@Autowired FetchPlans fetchPlans) {
+        return fetchPlans.builder(BookInstance.class)
+                .add("bookPublication", publication -> {
+                    publication.add("book", book -> {
+                        book.add("name");
+                    });
+                })
+                .add("libraryDepartment", department -> {
+                    department.add("name");
+                })
+                .build();
     }
 }
