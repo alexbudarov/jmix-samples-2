@@ -5,9 +5,7 @@ import com.company.library.reports.annotation.*;
 import com.company.library.reports.api.ErrorConsumer;
 import io.jmix.core.*;
 import io.jmix.core.querycondition.PropertyCondition;
-import io.jmix.reports.entity.DataSetType;
-import io.jmix.reports.entity.Orientation;
-import io.jmix.reports.entity.ParameterType;
+import io.jmix.reports.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
@@ -87,4 +85,12 @@ public interface BooksItemLocationReport {
                 })
                 .build();
     }
+
+    @TemplateDef(
+            outputType = ReportOutputType.XLSX,
+            filePath = "com/company/library/reports/BookItemsLocation.xlsx",
+            isDefault = true,
+            outputNamePattern = "Book Items location.xlsx"
+    )
+    void defaultTemplate();
 }
