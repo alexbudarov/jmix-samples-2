@@ -36,4 +36,12 @@ public @interface ReportDef {
     String uuid() default "";
 
     Class<?> group();
+
+    boolean availableThroughRestApi() default false;
+
+    boolean system() default false;
+
+    // todo cross-parameter validation: validationScript (with lambda),
+    // validationOn - implicitly
+    // isTmp, rolesIdx, screensIdx, inputEntityTypesIdx, xml - not necessary here
 }
