@@ -2,15 +2,15 @@ package com.company.library.reports;
 
 import com.company.library.entity.Book;
 import com.company.library.reports.annotation.*;
+import com.company.library.reports.api.DataSetDataLoader;
+import com.company.library.reports.api.Factory;
+import com.company.library.reports.api.FetchPlanProvider;
 import io.jmix.core.DataManager;
-import io.jmix.core.FetchPlan;
 import io.jmix.core.FetchPlans;
 import io.jmix.reports.entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,15 +37,17 @@ public interface BookRecordReport {
     )
     void rootBand();
 
-    @DataSetImplementation(dataSet = "title")
-    default List<Map<String, Object>> titleImplementation(@ReportParameters Map<String, Object> parameters) {
-        Book book = (Book) parameters.get("entity");
-        return List.of(
-                Map.of(
-                        "title",
-                        "Book Record - %s".formatted(book.getName())
-                )
-        );
+    @RelatesTo(dataSet = "title")
+    default DataSetDataLoader titleDataLoader() {
+        return (parameters, parentBand, applicationContext) -> {
+            Book book = (Book) parameters.get("entity");
+            return List.of(
+                    Map.of(
+                            "title",
+                            "Book Record - %s".formatted(book.getName())
+                    )
+            );
+        };
     }
 
     @BandDef(name = "Book1", parent = "Root", orientation = Orientation.HORIZONTAL)
@@ -58,15 +60,17 @@ public interface BookRecordReport {
     )
     void book1Band();
 
-    @DataSetFetchPlan(name = "Book1")
-    default FetchPlan book1FetchPlan(@Autowired FetchPlans fetchPlans) {
-        return fetchPlans.builder(Book.class)
-                .add("name")
-                .add("summary")
-                .add("literatureType", literatureType -> {
-                    literatureType.add("name");
-                })
-                .build();
+    @RelatesTo(dataSet = "Book1")
+    default FetchPlanProvider book1FetchPlan() {
+        return applicationContext -> {
+            return applicationContext.getBean(FetchPlans.class).builder(Book.class)
+                    .add("name")
+                    .add("summary")
+                    .add("literatureType", literatureType -> {
+                        literatureType.add("name");
+                    })
+                    .build();
+        };
     }
 
     @BandDef(name = "Authors2", parent = "Root", orientation = Orientation.HORIZONTAL)
@@ -80,15 +84,17 @@ public interface BookRecordReport {
     )
     void authors2Band();
 
-    @DataSetFetchPlan(name = "Authors2")
-    default FetchPlan authors2FetchPlan(@Autowired FetchPlans fetchPlans) {
+    @RelatesTo(dataSet = "Authors2")
+    default FetchPlanProvider authors2FetchPlan() {
         // !!! we specify fetch plan for Book, not for nested authors
-        return fetchPlans.builder(Book.class)
-                .add("authors", author -> {
-                    author.add("firstName")
-                            .add("lastName");
-                })
-                .build();
+        return applicationContext -> {
+            return applicationContext.getBean(FetchPlans.class).builder(Book.class)
+                    .add("authors", author -> {
+                        author.add("firstName")
+                                .add("lastName");
+                    })
+                    .build();
+        };
     }
 
     // concept of custom factory method for report template
@@ -96,20 +102,24 @@ public interface BookRecordReport {
             outputType = ReportOutputType.PDF,
             isDefault = true
     )
-    default ReportTemplate defaultTemplate(@Autowired DataManager dataManager, @Autowired ResourceLoader resourceLoader)
-            throws IOException {
-        ReportTemplate t = dataManager.create(ReportTemplate.class);
+    default Factory<ReportTemplate> defaultTemplate() {
+        return applicationContext -> {
+            DataManager dataManager = applicationContext.getBean(DataManager.class);
+            ResourceLoader resourceLoader = applicationContext.getBean(ResourceLoader.class);
 
-        byte[] customTemplateFromDb = loadTemplateFileFromDatabase(dataManager);
-        if (customTemplateFromDb.length == 0) {
-            Resource file = resourceLoader.getResource("com/company/library/reports/new/Template-for-BookRecord.docx");
-            t.setContent(file.getContentAsByteArray());
-        } else {
-            t.setContent(customTemplateFromDb);
-        }
+            ReportTemplate t = dataManager.create(ReportTemplate.class);
 
-        t.setOutputNamePattern("${Root.title}.pdf");
-        return t;
+            byte[] customTemplateFromDb = loadTemplateFileFromDatabase(dataManager);
+            if (customTemplateFromDb.length == 0) {
+                Resource file = resourceLoader.getResource("com/company/library/reports/new/Template-for-BookRecord.docx");
+                t.setContent(file.getContentAsByteArray());
+            } else {
+                t.setContent(customTemplateFromDb);
+            }
+
+            t.setOutputNamePattern("${Root.title}.pdf");
+            return t;
+        };
     }
 
     default byte[] loadTemplateFileFromDatabase(DataManager dataManager) {

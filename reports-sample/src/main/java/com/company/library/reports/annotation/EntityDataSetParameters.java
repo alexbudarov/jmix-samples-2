@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @see DataSetFetchPlan
+ * @see com.company.library.reports.api.FetchPlanProvider
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,6 +24,4 @@ public @interface EntityDataSetParameters {
     boolean useExistingFetchPlan() default false;
 
     String fetchPlanName() default "";
-
-    String[] fetchPlan() default {};
 }

@@ -2,11 +2,13 @@ package com.company.library.reports;
 
 import com.company.library.entity.BookInstance;
 import com.company.library.reports.annotation.*;
-import com.company.library.reports.api.ErrorConsumer;
+import com.company.library.reports.api.DefaultValueProvider;
+import com.company.library.reports.api.FetchPlanProvider;
+import com.company.library.reports.api.ParameterTransformer;
+import com.company.library.reports.api.ParameterValidator;
 import io.jmix.core.*;
 import io.jmix.core.querycondition.PropertyCondition;
 import io.jmix.reports.entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,30 +29,38 @@ public interface BooksItemLocationReport {
     )
     void entitiesInputParameter();
 
-    @InputParameterValidation(alias = "entities")
-    default void validateEntities(@ParameterValue List<BookInstance> entities, @Autowired Messages messages, ErrorConsumer errorConsumer) {
-        if (entities.size() > 1000) {
-            errorConsumer.showErrorMessage(messages.getMessage("report.booksItemLocation.entities.tooBig"));
-        }
+    @RelatesTo(inputParameter = "entities")
+    default ParameterValidator<List<BookInstance>> validateEntities() {
+        return (value, errorConsumer, applicationContext) -> {
+            if (value.size() > 1000) {
+                Messages messages = applicationContext.getBean(Messages.class);
+                errorConsumer.addError(messages.getMessage("report.booksItemLocation.entities.tooBig"));
+            }
+        };
     }
 
-    @InputParameterTransformation(alias = "entities")
-    default List<BookInstance> transformEntities(@ParameterValue List<BookInstance> entities) {
-        return entities.stream()
-                .sorted(Comparator.comparing(BookInstance::getInventoryNumber))
-                .toList();
+    @RelatesTo(inputParameter = "entities")
+    default ParameterTransformer<List<BookInstance>> transformEntities() {
+        return (value, params, applicationContext) -> {
+            return value.stream()
+                    .sorted(Comparator.comparing(BookInstance::getInventoryNumber))
+                    .toList();
+        };
     }
 
-    @InputParameterDefaultValue(alias = "entities")
-    default List<BookInstance> defaultValueEntities(@Autowired DataManager dataManager) {
-        return List.of(
-                dataManager.load(BookInstance.class)
-                        .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 155L))
-                        .one(),
-                dataManager.load(BookInstance.class)
-                        .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 487L))
-                        .one()
-        );
+    @RelatesTo(inputParameter = "entities")
+    default DefaultValueProvider<List<BookInstance>> defaultValueEntities() {
+        return applicationContext -> {
+            DataManager dataManager = applicationContext.getBean(DataManager.class);
+            return List.of(
+                    dataManager.load(BookInstance.class)
+                            .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 155L))
+                            .one(),
+                    dataManager.load(BookInstance.class)
+                            .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 487L))
+                            .one()
+            );
+        };
     }
 
     // maybe make implicit?
@@ -65,25 +75,25 @@ public interface BooksItemLocationReport {
             name = "BookInstances",
             type = DataSetType.MULTI,
             entity = @EntityDataSetParameters(
-                    listParameterAlias = "entities",
-                    fetchPlan = {"bookPublication.book.name", "libraryDepartment.name"} // OR variant like below
+                    listParameterAlias = "entities"
             )
     )
     void bookInstancesBand();
 
-    @DataSetFetchPlan(name = "BookInstances")
-    // @SupplyAttribute(target = "BookInstances", attribute = "fetchPlan")
-    default FetchPlan bookInstancesFetchPlan(@Autowired FetchPlans fetchPlans) {
-        return fetchPlans.builder(BookInstance.class)
-                .add("bookPublication", publication -> {
-                    publication.add("book", book -> {
-                        book.add("name");
-                    });
-                })
-                .add("libraryDepartment", department -> {
-                    department.add("name");
-                })
-                .build();
+    @RelatesTo(dataSet = "BookInstances")
+    default FetchPlanProvider bookInstancesFetchPlan() {
+        return applicationContext -> {
+            return applicationContext.getBean(FetchPlans.class).builder(BookInstance.class)
+                    .add("bookPublication", publication -> {
+                        publication.add("book", book -> {
+                            book.add("name");
+                        });
+                    })
+                    .add("libraryDepartment", department -> {
+                        department.add("name");
+                    })
+                    .build();
+        };
     }
 
     @TemplateDef(

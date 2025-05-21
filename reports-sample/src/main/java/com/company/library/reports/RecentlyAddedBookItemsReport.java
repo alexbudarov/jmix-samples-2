@@ -1,6 +1,7 @@
 package com.company.library.reports;
 
 import com.company.library.reports.annotation.*;
+import com.company.library.reports.api.ParameterTransformer;
 import io.jmix.reports.entity.DataSetType;
 import io.jmix.reports.entity.Orientation;
 import io.jmix.reports.entity.ParameterType;
@@ -24,9 +25,11 @@ public interface RecentlyAddedBookItemsReport {
     )
     void createDtInputParameter();
 
-    @InputParameterTransformation(alias = "createDt")
-    default Object createDtTransform(@ParameterValue Date paramValue) {
-        return paramValue.toInstant().atOffset(ZoneOffset.UTC);
+    @RelatesTo(inputParameter = "createDt")
+    default ParameterTransformer<Date> createDtTransform() {
+        return (value, params, applicationContext) -> {
+            return value.toInstant().atOffset(ZoneOffset.UTC);
+        };
     }
 
     @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)

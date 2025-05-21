@@ -2,6 +2,7 @@ package com.company.library.reports;
 
 import com.company.library.entity.BookPublication;
 import com.company.library.reports.annotation.*;
+import com.company.library.reports.api.FetchPlanProvider;
 import com.company.library.security.FullAccessRole;
 import com.company.library.security.UserManagementRole;
 import com.company.library.view.bookpublication.BookPublicationListView;
@@ -11,7 +12,6 @@ import io.jmix.reports.entity.DataSetType;
 import io.jmix.reports.entity.Orientation;
 import io.jmix.reports.entity.ParameterType;
 import io.jmix.reports.entity.ReportOutputType;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ReportDef(
         name = "Publication details",
@@ -43,14 +43,16 @@ public interface PublicationDetailsReport {
     )
     void bookPublicationBand();
 
-    @DataSetFetchPlan(name = "BookPublication")
-    default FetchPlan bookPublicationFetchPlan(@Autowired FetchPlans fetchPlans) {
-        return fetchPlans.builder(BookPublication.class)
-                .add("year")
-                .add("book", FetchPlan.INSTANCE_NAME)
-                .add("publisher", FetchPlan.INSTANCE_NAME)
-                .add("city", FetchPlan.INSTANCE_NAME)
-                .build();
+    @RelatesTo(dataSet = "BookPublication")
+    default FetchPlanProvider bookPublicationFetchPlan() {
+        return applicationContext -> {
+            return applicationContext.getBean(FetchPlans.class).builder(BookPublication.class)
+                    .add("year")
+                    .add("book", FetchPlan.INSTANCE_NAME)
+                    .add("publisher", FetchPlan.INSTANCE_NAME)
+                    .add("city", FetchPlan.INSTANCE_NAME)
+                    .build();
+        };
     }
 
     @TemplateDef(

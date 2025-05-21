@@ -1,12 +1,13 @@
 package com.company.library.reports;
 
 import com.company.library.reports.annotation.*;
+import com.company.library.reports.api.DataSetDataLoader;
+import com.company.library.reports.api.ValueFormatter;
 import io.jmix.core.TimeSource;
 import io.jmix.core.security.CurrentAuthentication;
 import io.jmix.reports.entity.DataSetType;
 import io.jmix.reports.entity.Orientation;
 import io.jmix.reports.entity.ReportOutputType;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
@@ -28,17 +29,18 @@ public interface PublicationsGroupedByTypesBooksReport {
     )
     void headerBand();
 
-    @DataSetImplementation(dataSet = "header")
-    default List<Map<String, Object>> headerImplementation(@Autowired TimeSource timeSource,
-                                                           @Autowired CurrentAuthentication currentAuthentication) {
-        String user = currentAuthentication.getUser().getUsername();
-        java.util.Date currentDate = timeSource.currentTimestamp();
-        return List.of(
-                Map.of(
-                        "generated_by", user,
-                        "generated_when", currentDate
-                )
-        );
+    @RelatesTo(dataSet = "header")
+    default DataSetDataLoader headerImplementation() {
+        return (parameters, parentBand, applicationContext) -> {
+            String user = applicationContext.getBean(CurrentAuthentication.class).getUser().getUsername();
+            java.util.Date currentDate = applicationContext.getBean(TimeSource.class).currentTimestamp();
+            return List.of(
+                    Map.of(
+                            "generated_by", user,
+                            "generated_when", currentDate
+                    )
+            );
+        };
     }
 
     @BandDef(name = "tableheader", parent = "Root", orientation = Orientation.HORIZONTAL)
@@ -100,7 +102,9 @@ public interface PublicationsGroupedByTypesBooksReport {
             band = "header",
             field = "generated_by"
     )
-    default String headerGeneratedWhenValueFormat(@ParameterValue String value) {
-        return value.toUpperCase();
+    default ValueFormatter<String> headerGeneratedByValueFormat() {
+        return (value, applicationContext) -> {
+            return value.toUpperCase();
+        };
     }
 }
