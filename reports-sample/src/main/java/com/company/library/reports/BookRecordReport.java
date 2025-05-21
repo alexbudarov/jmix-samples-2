@@ -29,7 +29,7 @@ public interface BookRecordReport {
     )
     void entityInputParameter();
 
-    @BandDef(name = BandDef.ROOT, root = true, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             name = "title",
             type = DataSetType.GROOVY // todo rename or add new constant "CODE" / "METHOD"
@@ -47,7 +47,7 @@ public interface BookRecordReport {
         );
     }
 
-    @BandDef(name = "Book1", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Book1", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             name = "Book1",
             type = DataSetType.SINGLE,
@@ -68,7 +68,7 @@ public interface BookRecordReport {
                 .build();
     }
 
-    @BandDef(name = "Authors2", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Authors2", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             name = "Authors2",
             type = DataSetType.MULTI,

@@ -18,10 +18,10 @@ import java.util.Map;
 )
 public interface PublicationsGroupedByTypesBooksReport {
 
-    @BandDef(name = BandDef.ROOT, root = true, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
     void rootBand();
 
-    @BandDef(name = "header", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "header", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             name = "header",
             type = DataSetType.GROOVY // todo rename or add new constant "CODE" / "METHOD"
@@ -41,10 +41,10 @@ public interface PublicationsGroupedByTypesBooksReport {
         );
     }
 
-    @BandDef(name = "tableheader", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "tableheader", parent = "Root", orientation = Orientation.HORIZONTAL)
     void tableheaderBand();
 
-    @BandDef(name = "type", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "type", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             type = DataSetType.JPQL,
             query = """

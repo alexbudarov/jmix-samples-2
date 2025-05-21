@@ -14,8 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BandDef {
 
-    String ROOT = "Root";
-
     String name() default "";
 
     boolean root() default false;

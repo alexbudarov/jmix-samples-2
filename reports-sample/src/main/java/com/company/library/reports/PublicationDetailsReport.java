@@ -30,10 +30,10 @@ public interface PublicationDetailsReport {
     void entityInputParameter();
 
     // maybe make implicit?
-    @BandDef(name = BandDef.ROOT, root = true, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
     void rootBand();
 
-    @BandDef(name = "BookPublication", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "BookPublication", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             name = "BookPublication",
             type = DataSetType.SINGLE,

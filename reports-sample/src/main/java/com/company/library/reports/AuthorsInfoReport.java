@@ -13,10 +13,10 @@ import io.jmix.reports.entity.ReportOutputType;
 )
 public interface AuthorsInfoReport {
 
-    @BandDef(name = BandDef.ROOT, root = true, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
     void rootBand();
 
-    @BandDef(name = "Authors", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Authors", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             type = DataSetType.JPQL,
             query = """

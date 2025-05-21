@@ -29,13 +29,13 @@ public interface RecentlyAddedBookItemsReport {
         return paramValue.toInstant().atOffset(ZoneOffset.UTC);
     }
 
-    @BandDef(name = BandDef.ROOT, root = true, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
     void rootBand();
 
-    @BandDef(name = "headerBookInstances", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "headerBookInstances", parent = "Root", orientation = Orientation.HORIZONTAL)
     void headerBookInstancesBand();
 
-    @BandDef(name = "BookInstances", parent = BandDef.ROOT, orientation = Orientation.HORIZONTAL)
+    @BandDef(name = "BookInstances", parent = "Root", orientation = Orientation.HORIZONTAL)
     @DataSetDef(
             type = DataSetType.JPQL,
             query = """
