@@ -13,7 +13,7 @@ public @interface ReportGroupDef {
      * Group title.
      * Use msg://group/key format if localization is required.
      */
-    String title() default "";
+    String title();
 
     /**
      * Unique group code, may be used to identify the group in APIs.

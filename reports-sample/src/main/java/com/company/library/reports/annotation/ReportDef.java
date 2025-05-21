@@ -13,7 +13,7 @@ public @interface ReportDef {
      * Report name.
      * Use msg://group/key format if localization is required.
      */
-    String name() default "";
+    String name();
 
     /**
      * Unique report code, may be used as a unique identifier for using in APIs.
