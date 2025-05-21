@@ -14,9 +14,11 @@ public @interface InputParameterDef {
 
     String alias();
 
+    /**
+     * Human-readable parameter name.
+     * Use msg://group/key format if localization is required.
+     */
     String name() default "";
-
-    String nameKey() default "";
 
     boolean required() default false;
 

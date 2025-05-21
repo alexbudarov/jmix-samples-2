@@ -18,6 +18,9 @@ public @interface EntityDataSetParameters {
     // listParamName
     String listParameterAlias() default "";
 
+    // second part of listParamName if it's like "param#nestedCollection"
+    String nestedCollectionAttribute() default "";
+
     boolean useExistingFetchPlan() default false;
 
     String fetchPlanName() default "";
