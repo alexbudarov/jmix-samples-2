@@ -2,14 +2,15 @@ package com.company.library.reports;
 
 import com.company.library.entity.Book;
 import com.company.library.reports.annotation.*;
+import io.jmix.core.DataManager;
 import io.jmix.core.FetchPlan;
 import io.jmix.core.FetchPlans;
-import io.jmix.reports.entity.DataSetType;
-import io.jmix.reports.entity.Orientation;
-import io.jmix.reports.entity.ParameterType;
-import io.jmix.reports.entity.ReportOutputType;
+import io.jmix.reports.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -90,11 +91,29 @@ public interface BookRecordReport {
                 .build();
     }
 
+    // concept of custom factory method for report template
     @TemplateDef(
             outputType = ReportOutputType.PDF,
-            filePath = "com/company/library/reports/new/Template-for-BookRecord.docx",
-            isDefault = true,
-            outputNamePattern = "${Root.title}.pdf"
+            isDefault = true
     )
-    void defaultTemplate();
+    default ReportTemplate defaultTemplate(@Autowired DataManager dataManager, @Autowired ResourceLoader resourceLoader)
+            throws IOException {
+        ReportTemplate t = dataManager.create(ReportTemplate.class);
+
+        byte[] customTemplateFromDb = loadTemplateFileFromDatabase(dataManager);
+        if (customTemplateFromDb.length == 0) {
+            Resource file = resourceLoader.getResource("com/company/library/reports/new/Template-for-BookRecord.docx");
+            t.setContent(file.getContentAsByteArray());
+        } else {
+            t.setContent(customTemplateFromDb);
+        }
+
+        t.setOutputNamePattern("${Root.title}.pdf");
+        return t;
+    }
+
+    default byte[] loadTemplateFileFromDatabase(DataManager dataManager) {
+        // todo load from database
+        return new byte[0];
+    }
 }
