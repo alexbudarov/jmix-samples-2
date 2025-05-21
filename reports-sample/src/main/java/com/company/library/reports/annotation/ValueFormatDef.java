@@ -12,17 +12,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValueFormatDef {
 
-    /**
-     * @return report field name with the band prefix, e.g. Book.year
-     */
-    String valueName();
+    // valueName - first part
+    String band();
+
+    // valueName - second part
+    String field();
 
     /**
      * @return field format.
      *   For number values specify the format according to the {@link java.text.DecimalFormat} rules,
      *   for dates - {@link java.text.SimpleDateFormat}.
      */
-    String formatString() default "";
+    String format() default "";
 
     // groovy - not supported. Instead of script, write the method implementation.
 }

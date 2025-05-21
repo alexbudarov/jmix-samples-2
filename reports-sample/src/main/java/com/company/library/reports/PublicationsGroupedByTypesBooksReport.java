@@ -89,14 +89,16 @@ public interface PublicationsGroupedByTypesBooksReport {
     void defaultTemplate();
 
     @ValueFormatDef(
-            valueName = "header.generated_when",
-            formatString = "dd.MM.yyyy"
+            band = "header",
+            field = "generated_when",
+            format = "dd.MM.yyyy"
     )
     void headerGeneratedWhenValueFormat();
 
     // method with flexible signature, instead of Groovy script
     @ValueFormatDef(
-            valueName = "header.generated_by"
+            band = "header",
+            field = "generated_by"
     )
     default String headerGeneratedWhenValueFormat(@ParameterValue String value) {
         return value.toUpperCase();

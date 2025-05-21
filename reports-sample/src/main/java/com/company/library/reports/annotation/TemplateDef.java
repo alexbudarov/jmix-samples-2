@@ -1,15 +1,16 @@
 package com.company.library.reports.annotation;
 
-import io.jmix.reports.entity.CustomTemplateDefinedBy;
 import io.jmix.reports.entity.ReportOutputType;
 import io.jmix.reports.entity.ReportTemplate;
-import io.jmix.reports.yarg.formatters.CustomReport;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * See also: {@link TemplateTableDef}
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TemplateDef {
@@ -32,6 +33,5 @@ public @interface TemplateDef {
 
     // groovy - seems unused
     // todo attributes for io.jmix.reports.entity.charts.AbstractChartDescription
-    // todo attributes for io.jmix.reports.entity.table.TemplateTableDescription
     // todo attributes for io.jmix.reports.entity.pivottable.PivotTableDescription
 }
