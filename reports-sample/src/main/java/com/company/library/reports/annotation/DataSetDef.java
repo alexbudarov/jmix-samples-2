@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 public @interface DataSetDef {
     String name() default "";
 
-    String text() default "";
+    String text() default ""; // todo is this attribute necessary at all?
 
     DataSetType type();
 
@@ -21,4 +21,7 @@ public @interface DataSetDef {
     String linkParameterName() default "";
     String dataStore() default "";
     boolean processTemplate() default false;
+
+    // text for JPQL or SQL
+    String query() default "";
 }
