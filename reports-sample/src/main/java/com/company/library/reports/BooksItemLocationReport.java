@@ -88,7 +88,7 @@ public interface BooksItemLocationReport {
 
     @TemplateDef(
             outputType = ReportOutputType.XLSX,
-            filePath = "com/company/library/reports/BookItemsLocation.xlsx",
+            filePath = "com/company/library/reports/new/BookItemsLocation.xlsx",
             isDefault = true,
             outputNamePattern = "Book Items location.xlsx"
     )

@@ -1,7 +1,6 @@
 package com.company.library.reports;
 
 import com.company.library.entity.Book;
-import com.company.library.entity.BookInstance;
 import com.company.library.reports.annotation.*;
 import io.jmix.core.FetchPlan;
 import io.jmix.core.FetchPlans;
@@ -93,7 +92,7 @@ public interface BookRecordReport {
 
     @TemplateDef(
             outputType = ReportOutputType.PDF,
-            filePath = "com/company/library/reports/Template-for-BookRecord.docx",
+            filePath = "com/company/library/reports/new/Template-for-BookRecord.docx",
             isDefault = true,
             outputNamePattern = "${Root.title}.pdf"
     )
