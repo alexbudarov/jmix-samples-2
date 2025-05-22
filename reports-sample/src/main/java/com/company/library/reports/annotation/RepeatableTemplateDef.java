@@ -5,14 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @see io.jmix.reports.entity.ReportScreen
- */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AvailableInViews {
+public @interface RepeatableTemplateDef {
 
-    String[] viewIds() default {};
+    TemplateDef[] value() default {};
 
-    Class[] viewClasses() default {};
 }

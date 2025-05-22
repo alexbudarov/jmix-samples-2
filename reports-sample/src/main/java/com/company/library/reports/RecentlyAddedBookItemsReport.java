@@ -15,33 +15,30 @@ import java.util.Date;
         code = "RECENTLY_ADDED_BOOK_ITEMS",
         group = DemoReportGroup.class
 )
-public interface RecentlyAddedBookItemsReport {
-
-    @InputParameterDef(
-            alias = "createDt",
-            name = "Create After",
-            type = ParameterType.DATETIME,
-            required = true
-    )
-    void createDtInputParameter();
-
-    @RelatesTo(inputParameter = "createDt")
-    default ParameterTransformer<Date> createDtTransform() {
-        return (value, params, applicationContext) -> {
-            return value.toInstant().atOffset(ZoneOffset.UTC);
-        };
-    }
-
-    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
-    void rootBand();
-
-    @BandDef(name = "headerBookInstances", parent = "Root", orientation = Orientation.HORIZONTAL)
-    void headerBookInstancesBand();
-
-    @BandDef(name = "BookInstances", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            type = DataSetType.JPQL,
-            query = """
+@InputParameterDef(
+        alias = "createDt",
+        name = "Create After",
+        type = ParameterType.DATETIME,
+        parameterClassName = java.util.Date.class,
+        required = true
+)
+@BandDef(
+        name = "Root",
+        root = true,
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "headerBookInstances",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "BookInstances",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                type = DataSetType.JPQL,
+                query = """
                     select bookPublication_book.name as "bookPublication.book.name",
                     libraryDepartment.name as "libraryDepartment.name"
                     from BookInstance e
@@ -49,14 +46,19 @@ public interface RecentlyAddedBookItemsReport {
                     left join e.libraryDepartment libraryDepartment
                     where e.createdDate >= ${createDt}
                     """
-    )
-    void bookInstancesBand();
+        )
+)
+@TemplateDef(
+        code = "DEFAULT",
+        outputType = ReportOutputType.XLSX,
+        filePath = "com/company/library/reports/new/RecentlyAddedBookItems.xlsx",
+        isDefault = true,
+        outputNamePattern = "Recently added book items.xlsx"
+)
+public class RecentlyAddedBookItemsReport {
 
-    @TemplateDef(
-            outputType = ReportOutputType.XLSX,
-            filePath = "com/company/library/reports/new/RecentlyAddedBookItems.xlsx",
-            isDefault = true,
-            outputNamePattern = "Recently added book items.xlsx"
-    )
-    void defaultTemplate();
+    @RelatesTo(inputParameter = "createDt")
+    public ParameterTransformer<Date> createDtTransform() {
+        return (value, params) -> value.toInstant().atOffset(ZoneOffset.UTC);
+    }
 }

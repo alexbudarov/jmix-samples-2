@@ -4,19 +4,22 @@ import io.jmix.reports.entity.DataSetType;
 
 import java.lang.annotation.*;
 
-@Target(ElementType.METHOD)
+/**
+ * @see io.jmix.reports.entity.DataSet
+ */
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(DataSetDefs.class)
 public @interface DataSetDef {
     String name() default "";
 
-    String text() default ""; // todo is this attribute necessary at all?
+    // text for GROOVY
+    String script() default "";
 
     DataSetType type();
 
     JsonDataSetParameters json() default @JsonDataSetParameters();
 
-    EntityDataSetParameters entity() default @EntityDataSetParameters();
+    EntityDataSetDef entity() default @EntityDataSetDef();
 
     String linkParameterName() default "";
     String dataStore() default "";

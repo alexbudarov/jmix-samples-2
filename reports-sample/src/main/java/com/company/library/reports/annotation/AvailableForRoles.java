@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * @see io.jmix.reports.entity.ReportRole
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AvailableForRoles {
 

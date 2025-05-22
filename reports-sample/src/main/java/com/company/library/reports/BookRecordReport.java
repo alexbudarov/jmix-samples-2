@@ -19,27 +19,67 @@ import java.util.Map;
         code = "book-report",
         group = DemoReportGroup.class
 )
-public interface BookRecordReport {
+@InputParameterDef(
+        alias = "entity",
+        name = "msg://com.company.library.reports/BookRecordReport.param.entity",
+        type = ParameterType.ENTITY,
+        required = true,
+        entity = @EntityParameterDef(entityClass = Book.class)
+)
+@BandDef(
+        name = "Root",
+        root = true,
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                name = "title",
+                type = DataSetType.GROOVY // todo add new constant "CODE" / "METHOD"
+        )
+)
+@BandDef(
+        name = "Book1",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                name = "Book1",
+                type = DataSetType.SINGLE,
+                entity = @EntityDataSetDef(
+                        parameterAlias = "entity"
+                )
+        )
+)
+@BandDef(
+        name = "Authors2",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                name = "Authors2",
+                type = DataSetType.MULTI,
+                entity = @EntityDataSetDef(
+                        parameterAlias = "entity",
+                        nestedCollectionAttribute = "authors"
+                )
+        )
+)
+@TemplateDef(
+        code = "DEFAULT",
+        outputType = ReportOutputType.PDF,
+        isDefault = true
+)
+public class BookRecordReport {
 
-    @InputParameterDef(
-            alias = "entity",
-            name = "msg://com.company.library.reports/BookRecordReport.param.entity",
-            type = ParameterType.ENTITY,
-            required = true,
-            entityParameters = @EntityParameterDef(entityClass = Book.class)
-    )
-    void entityInputParameter();
+    private final FetchPlans fetchPlans;
+    private final DataManager dataManager;
+    private final ResourceLoader resourceLoader;
 
-    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            name = "title",
-            type = DataSetType.GROOVY // todo rename or add new constant "CODE" / "METHOD"
-    )
-    void rootBand();
+    public BookRecordReport(FetchPlans fetchPlans, DataManager dataManager, ResourceLoader resourceLoader) {
+        this.fetchPlans = fetchPlans;
+        this.dataManager = dataManager;
+        this.resourceLoader = resourceLoader;
+    }
 
     @RelatesTo(dataSet = "title")
-    default DataSetDataLoader titleDataLoader() {
-        return (parameters, parentBand, applicationContext) -> {
+    public DataSetDataLoader titleDataLoader() {
+        return (parameters, parentBand) -> {
             Book book = (Book) parameters.get("entity");
             return List.of(
                     Map.of(
@@ -50,66 +90,35 @@ public interface BookRecordReport {
         };
     }
 
-    @BandDef(name = "Book1", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            name = "Book1",
-            type = DataSetType.SINGLE,
-            entity = @EntityDataSetParameters(
-                    parameterAlias = "entity"
-            )
-    )
-    void book1Band();
-
     @RelatesTo(dataSet = "Book1")
-    default FetchPlanProvider book1FetchPlan() {
-        return applicationContext -> {
-            return applicationContext.getBean(FetchPlans.class).builder(Book.class)
-                    .add("name")
-                    .add("summary")
-                    .add("literatureType", literatureType -> {
-                        literatureType.add("name");
-                    })
-                    .build();
-        };
+    public FetchPlanProvider book1FetchPlan() {
+        return () -> fetchPlans.builder(Book.class)
+                .add("name")
+                .add("summary")
+                .add("literatureType", literatureType -> {
+                    literatureType.add("name");
+                })
+                .build();
     }
-
-    @BandDef(name = "Authors2", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            name = "Authors2",
-            type = DataSetType.MULTI,
-            entity = @EntityDataSetParameters(
-                    parameterAlias = "entity",
-                    nestedCollectionAttribute = "authors"
-            )
-    )
-    void authors2Band();
 
     @RelatesTo(dataSet = "Authors2")
-    default FetchPlanProvider authors2FetchPlan() {
+    public FetchPlanProvider authors2FetchPlan() {
         // !!! we specify fetch plan for Book, not for nested authors
-        return applicationContext -> {
-            return applicationContext.getBean(FetchPlans.class).builder(Book.class)
-                    .add("authors", author -> {
-                        author.add("firstName")
-                                .add("lastName");
-                    })
-                    .build();
-        };
+        return () -> fetchPlans.builder(Book.class)
+                .add("authors", author -> {
+                    author.add("firstName")
+                            .add("lastName");
+                })
+                .build();
     }
 
-    // concept of custom factory method for report template
-    @TemplateDef(
-            outputType = ReportOutputType.PDF,
-            isDefault = true
-    )
-    default Factory<ReportTemplate> defaultTemplate() {
-        return applicationContext -> {
-            DataManager dataManager = applicationContext.getBean(DataManager.class);
-            ResourceLoader resourceLoader = applicationContext.getBean(ResourceLoader.class);
-
+    // example of custom factory method for report template
+    @RelatesTo(template = "DEFAULT")
+    public Factory<ReportTemplate> defaultTemplate() {
+        return () -> {
             ReportTemplate t = dataManager.create(ReportTemplate.class);
 
-            byte[] customTemplateFromDb = loadTemplateFileFromDatabase(dataManager);
+            byte[] customTemplateFromDb = loadTemplateFileFromDatabase();
             if (customTemplateFromDb.length == 0) {
                 Resource file = resourceLoader.getResource("com/company/library/reports/new/Template-for-BookRecord.docx");
                 t.setContent(file.getContentAsByteArray());
@@ -122,7 +131,7 @@ public interface BookRecordReport {
         };
     }
 
-    default byte[] loadTemplateFileFromDatabase(DataManager dataManager) {
+    public byte[] loadTemplateFileFromDatabase() {
         // todo load from database
         return new byte[0];
     }

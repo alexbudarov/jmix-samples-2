@@ -18,62 +18,60 @@ import io.jmix.reports.entity.ReportOutputType;
         code = "PUBL",
         group = DemoReportGroup.class
 )
-public interface PublicationDetailsReport {
+@InputParameterDef(
+        alias = "entity",
+        name = "Entity",
+        type = ParameterType.ENTITY,
+        required = true,
+        entity = @EntityParameterDef(entityClass = BookPublication.class)
+)
+@BandDef(
+        name = "Root",
+        root = true,
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "BookPublication",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                name = "BookPublication",
+                type = DataSetType.SINGLE,
+                entity = @EntityDataSetDef(
+                        parameterAlias = "entity"
+                )
+        )
+)
+@TemplateDef(
+        code = "DEFAULT",
+        outputType = ReportOutputType.DOCX,
+        filePath = "com/company/library/reports/new/Template-for-PublicationDetailsReport.docx",
+        isDefault = true,
+        outputNamePattern = "Report for entity Book publication.docx"
+)
+@TemplateDef(
+        code = "publication-template",
+        outputType = ReportOutputType.PDF,
+        filePath = "com/company/library/reports/new/Template-for-PublicationDetailsReport.docx",
+        outputNamePattern = "Publication details.pdf"
+)
+@AvailableInViews(viewClasses = BookPublicationListView.class)
+@AvailableForRoles(roleClasses = {FullAccessRole.class, UserManagementRole.class})
+public class PublicationDetailsReport {
 
-    @InputParameterDef(
-            alias = "entity",
-            name = "Entity",
-            type = ParameterType.ENTITY,
-            required = true,
-            entityParameters = @EntityParameterDef(entityClass = BookPublication.class)
-    )
-    void entityInputParameter();
+    private final FetchPlans fetchPlans;
 
-    // maybe make implicit?
-    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
-    void rootBand();
-
-    @BandDef(name = "BookPublication", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            name = "BookPublication",
-            type = DataSetType.SINGLE,
-            entity = @EntityDataSetParameters(
-                    parameterAlias = "entity"
-            )
-    )
-    void bookPublicationBand();
-
-    @RelatesTo(dataSet = "BookPublication")
-    default FetchPlanProvider bookPublicationFetchPlan() {
-        return applicationContext -> {
-            return applicationContext.getBean(FetchPlans.class).builder(BookPublication.class)
-                    .add("year")
-                    .add("book", FetchPlan.INSTANCE_NAME)
-                    .add("publisher", FetchPlan.INSTANCE_NAME)
-                    .add("city", FetchPlan.INSTANCE_NAME)
-                    .build();
-        };
+    public PublicationDetailsReport(FetchPlans fetchPlans) {
+        this.fetchPlans = fetchPlans;
     }
 
-    @TemplateDef(
-            outputType = ReportOutputType.DOCX,
-            filePath = "com/company/library/reports/new/Template-for-PublicationDetailsReport.docx",
-            isDefault = true,
-            outputNamePattern = "Report for entity Book publication.docx"
-    )
-    void defaultTemplate();
-
-    @TemplateDef(
-            code = "publication-template",
-            outputType = ReportOutputType.PDF,
-            filePath = "com/company/library/reports/new/Template-for-PublicationDetailsReport.docx",
-            outputNamePattern = "Publication details.pdf"
-    )
-    void publicationTemplateTemplate();
-
-    @AvailableInViews(viewClasses = BookPublicationListView.class)
-    void views();
-
-    @AvailableForRoles(roleClasses = {FullAccessRole.class, UserManagementRole.class})
-    void roles();
+    @RelatesTo(dataSet = "BookPublication")
+    public FetchPlanProvider bookPublicationFetchPlan() {
+        return () -> fetchPlans.builder(BookPublication.class)
+                .add("year")
+                .add("book", FetchPlan.INSTANCE_NAME)
+                .add("publisher", FetchPlan.INSTANCE_NAME)
+                .add("city", FetchPlan.INSTANCE_NAME)
+                .build();
+    }
 }

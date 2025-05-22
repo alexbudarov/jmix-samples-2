@@ -6,11 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * @see io.jmix.reports.entity.DataSet
  * @see com.company.library.reports.api.FetchPlanProvider
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EntityDataSetParameters {
+public @interface EntityDataSetDef {
 
     // paramName
     String parameterAlias() default "";

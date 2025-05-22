@@ -11,15 +11,14 @@ import io.jmix.reports.entity.ReportOutputType;
         group = DemoReportGroup.class,
         description = "Example report with Table template"
 )
-public interface AuthorsInfoReport {
-
-    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
-    void rootBand();
-
-    @BandDef(name = "Authors", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            type = DataSetType.JPQL,
-            query = """
+@BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
+@BandDef(
+        name = "Authors",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                type = DataSetType.JPQL,
+                query = """
                     select
                     e.createdDate as "createdDate",
                     e.createdBy as "createdBy",
@@ -27,42 +26,40 @@ public interface AuthorsInfoReport {
                     e.lastName as "lastName"
                     from Author e
                     """
-    )
-    void bookInstancesBand();
-
-    @TemplateDef(
-            outputType = ReportOutputType.TABLE,
-            isDefault = true
-    )
-    @TemplateTableDef(
-            bands = @TableBandDef(
-                    bandName = "Authors",
-                    columns = {
-                            @TableColumnDef(
-                                    key = "createdDate",
-                                    caption = "msg://com.company.library.entity/Author.createdDate"
-                            ),
-                            @TableColumnDef(
-                                    key = "createdBy",
-                                    caption = "com.company.library.entity/Author.createdBy"
-                            ),
-                            @TableColumnDef(
-                                    key = "firstName",
-                                    caption = "com.company.library.entity/Author.firstName"
-                            ),
-                            @TableColumnDef(
-                                    key = "lastName",
-                                    caption = "com.company.library.entity/Author.lastName"
-                            ),
-                    }
-            )
-    )
-    void defaultTemplate();
-
-    @ValueFormatDef(
-            band = "Authors",
-            field = "createdDate",
-            format = "dd.MM.yyyy HH:mm:ss"
-    )
-    void authorsCreatedDateValueFormat();
+        )
+)
+@TemplateDef(
+        code = "DEFAULT",
+        outputType = ReportOutputType.TABLE,
+        isDefault = true,
+        table = @TemplateTableDef(
+                bands = @TableBandDef(
+                        bandName = "Authors",
+                        columns = {
+                                @TableColumnDef(
+                                        key = "createdDate",
+                                        caption = "msg://com.company.library.entity/Author.createdDate"
+                                ),
+                                @TableColumnDef(
+                                        key = "createdBy",
+                                        caption = "com.company.library.entity/Author.createdBy"
+                                ),
+                                @TableColumnDef(
+                                        key = "firstName",
+                                        caption = "com.company.library.entity/Author.firstName"
+                                ),
+                                @TableColumnDef(
+                                        key = "lastName",
+                                        caption = "com.company.library.entity/Author.lastName"
+                                ),
+                        }
+                )
+        )
+)
+@ValueFormatDef(
+        band = "Authors",
+        field = "createdDate",
+        format = "dd.MM.yyyy HH:mm:ss"
+)
+public class AuthorsInfoReport {
 }

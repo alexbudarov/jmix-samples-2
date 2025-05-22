@@ -1,15 +1,13 @@
 package com.company.library.reports.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @see io.jmix.reports.entity.ReportValueFormat
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(RepeatableValueFormatDef.class)
 public @interface ValueFormatDef {
 
     // valueName - first part
@@ -25,5 +23,5 @@ public @interface ValueFormatDef {
      */
     String format() default "";
 
-    // groovy - not supported. Instead of script, write the method implementation.
+    // groovy - not supported. Instead of script, write ValueFormatter method
 }

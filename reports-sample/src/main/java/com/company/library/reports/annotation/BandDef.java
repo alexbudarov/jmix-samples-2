@@ -1,17 +1,16 @@
 package com.company.library.reports.annotation;
 
+import io.jmix.reports.entity.BandDefinition;
 import io.jmix.reports.entity.Orientation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * @see DataSetDef
+ * @see BandDefinition
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(RepeatableBandDef.class)
 public @interface BandDef {
 
     String name() default "";
@@ -19,6 +18,8 @@ public @interface BandDef {
     boolean root() default false;
     String parent() default "";
     Orientation orientation();
+
+    DataSetDef[] dataSets() default {};
 
     // position - implicitly by definition order
     // multiDataSet - implicitly

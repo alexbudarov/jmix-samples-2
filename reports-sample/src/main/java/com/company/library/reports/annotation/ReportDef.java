@@ -1,13 +1,23 @@
 package com.company.library.reports.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @see io.jmix.reports.entity.Report
+ */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Component
 public @interface ReportDef {
+
+    @AliasFor(annotation = Component.class)
+    String beanName() default "";
 
     /**
      * Report name.
@@ -26,7 +36,8 @@ public @interface ReportDef {
     String description() default "";
 
     /**
-     * Optional id in the UUID format.
+     * Optional unique id in the UUID format.
+     * Specify this attribute to have stable object id in runtime (e.g. for URL routes)
      */
     String uuid() default "";
 
@@ -39,4 +50,5 @@ public @interface ReportDef {
     // todo cross-parameter validation: validationScript (with lambda),
     // validationOn - implicitly
     // isTmp, rolesIdx, screensIdx, inputEntityTypesIdx, xml - not necessary here
+
 }

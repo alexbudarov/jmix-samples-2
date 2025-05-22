@@ -3,13 +3,14 @@ package com.company.library.reports.annotation;
 import io.jmix.reports.entity.ParameterType;
 import io.jmix.reports.entity.PredefinedTransformation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
-@Target({ElementType.METHOD})
+/**
+ * @see io.jmix.reports.entity.ReportInputParameter
+ */
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(RepeatableInputParameterDef.class)
 public @interface InputParameterDef {
 
     String alias();
@@ -24,11 +25,16 @@ public @interface InputParameterDef {
 
     ParameterType type();
 
+    // parameterClassName
+    // probably makes sense only for Date/time types
+    Class<?> parameterClassName() default void.class;
+
     Class<?> enumerationClass() default void.class;
 
+    // for complex types - use DefaultValueProvider method
     String defaultValue() default ""; // todo provide additional configuration method
 
-    EntityParameterDef entityParameters() default @EntityParameterDef();
+    EntityParameterDef entity() default @EntityParameterDef();
 
     boolean predefinedTransformationEnabled() default false; // because there's no NONE enum value
     PredefinedTransformation predefinedTransformation() default PredefinedTransformation.CONTAINS;
@@ -38,7 +44,6 @@ public @interface InputParameterDef {
     boolean defaultDateIsCurrent() default false;
 
     // position - determine automatically by order of declaration
-    // parameterClassName - auto calculated, not necessary
     // transformationScript - method with @EntityParameterTransformation
     // validationScript - method with @EntityParameterValidation
     // validationOn - auto-determine if annotated method exists

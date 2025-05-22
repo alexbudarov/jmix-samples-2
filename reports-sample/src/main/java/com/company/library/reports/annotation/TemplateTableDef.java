@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * @see TemplateTableDescription
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TemplateTableDef {
 

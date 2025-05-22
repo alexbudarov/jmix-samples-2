@@ -9,6 +9,7 @@ import io.jmix.reports.entity.DataSetType;
 import io.jmix.reports.entity.Orientation;
 import io.jmix.reports.entity.ReportOutputType;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,23 +18,97 @@ import java.util.Map;
         code = "PUBLICATIONS_GROUPED",
         group = DemoReportGroup.class
 )
-public interface PublicationsGroupedByTypesBooksReport {
+@BandDef(
+        name = "Root",
+        root = true,
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "header",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                name = "header",
+                type = DataSetType.GROOVY // todo add new constant "CODE" / "METHOD"
+        )
+)
+@BandDef(
+        name = "tableheader",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "type",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                type = DataSetType.JPQL,
+                query = """
+                    select b.literatureType.id as typeId,
+                    b.literatureType.name as type
+                    from Book b
+                    """
+        )
+)
+@BandDef(
+        name = "book",
+        parent = "type",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                type = DataSetType.JPQL,
+                query = """
+                    select b.id as bookId,
+                    b.name as bookName
+                    from Book b
+                    where b.literatureType.id = ${type.typeId}
+                    """
+        )
+)
+@BandDef(
+        name = "publisher",
+        parent = "book",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                type = DataSetType.JPQL,
+                query = """
+                    select bp.publisher.name as publisher,
+                    bp.year as year,
+                    bp.city as town
+                    from BookPublication bp
+                    where bp.book.id = ${book.bookId}
+                    """
+        )
+)
+@TemplateDef(
+        code = "DEFAULT",
+        outputType = ReportOutputType.XLSX,
+        filePath = "com/company/library/reports/new/Template for publications by type.xlsx",
+        isDefault = true,
+        outputNamePattern = "Publications grouped by types and books"
+)
+@ValueFormatDef(
+        band = "header",
+        field = "generated_when",
+        format = "dd.MM.yyyy"
+)
+@ValueFormatDef(
+        band = "header",
+        field = "generated_by"
+)
+public class PublicationsGroupedByTypesBooksReport {
+    private final CurrentAuthentication currentAuthentication;
+    private final TimeSource timeSource;
 
-    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
-    void rootBand();
-
-    @BandDef(name = "header", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            name = "header",
-            type = DataSetType.GROOVY // todo rename or add new constant "CODE" / "METHOD"
-    )
-    void headerBand();
+    public PublicationsGroupedByTypesBooksReport(CurrentAuthentication currentAuthentication, TimeSource timeSource) {
+        this.currentAuthentication = currentAuthentication;
+        this.timeSource = timeSource;
+    }
 
     @RelatesTo(dataSet = "header")
-    default DataSetDataLoader headerImplementation() {
-        return (parameters, parentBand, applicationContext) -> {
-            String user = applicationContext.getBean(CurrentAuthentication.class).getUser().getUsername();
-            java.util.Date currentDate = applicationContext.getBean(TimeSource.class).currentTimestamp();
+    public DataSetDataLoader headerImplementation() {
+        return (parameters, parentBand) -> {
+            String user = currentAuthentication.getUser().getUsername();
+            Date currentDate = timeSource.currentTimestamp();
             return List.of(
                     Map.of(
                             "generated_by", user,
@@ -43,68 +118,9 @@ public interface PublicationsGroupedByTypesBooksReport {
         };
     }
 
-    @BandDef(name = "tableheader", parent = "Root", orientation = Orientation.HORIZONTAL)
-    void tableheaderBand();
-
-    @BandDef(name = "type", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            type = DataSetType.JPQL,
-            query = """
-                    select b.literatureType.id as typeId,
-                    b.literatureType.name as type
-                    from Book b
-                    """
-    )
-    void typeBand();
-
-    @BandDef(name = "book", parent = "type", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            type = DataSetType.JPQL,
-            query = """
-                    select b.id as bookId,
-                    b.name as bookName
-                    from Book b
-                    where b.literatureType.id = ${type.typeId}
-                    """
-    )
-    void bookBand();
-
-    @BandDef(name = "publisher", parent = "book", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            type = DataSetType.JPQL,
-            query = """
-                    select bp.publisher.name as publisher,
-                    bp.year as year,
-                    bp.city as town
-                    from BookPublication bp
-                    where bp.book.id = ${book.bookId}
-                    """
-    )
-    void publisherBand();
-
-    @TemplateDef(
-            outputType = ReportOutputType.XLSX,
-            filePath = "com/company/library/reports/new/Template for publications by type.xlsx",
-            isDefault = true,
-            outputNamePattern = "Publications grouped by types and books"
-    )
-    void defaultTemplate();
-
-    @ValueFormatDef(
-            band = "header",
-            field = "generated_when",
-            format = "dd.MM.yyyy"
-    )
-    void headerGeneratedWhenValueFormat();
-
     // method with flexible signature, instead of Groovy script
-    @ValueFormatDef(
-            band = "header",
-            field = "generated_by"
-    )
-    default ValueFormatter<String> headerGeneratedByValueFormat() {
-        return (value, applicationContext) -> {
-            return value.toUpperCase();
-        };
+    @RelatesTo(valueFormat = "header.generated_by")
+    public ValueFormatter<String> headerGeneratedByValueFormat() {
+        return value -> value != null ? value.toUpperCase() : null;
     }
 }

@@ -3,18 +3,17 @@ package com.company.library.reports.annotation;
 import io.jmix.reports.entity.ReportOutputType;
 import io.jmix.reports.entity.ReportTemplate;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * See also: {@link TemplateTableDef}
+ * @see ReportTemplate
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(RepeatableTemplateDef.class)
 public @interface TemplateDef {
-    String code() default ReportTemplate.DEFAULT_TEMPLATE_CODE;
+
+    String code();
 
     boolean isDefault() default false;
 
@@ -30,6 +29,8 @@ public @interface TemplateDef {
     // determines name and content
     // (resource path to file in /src/xxx/resources/yyy)
     String filePath() default "";
+
+    TemplateTableDef table() default @TemplateTableDef(bands = {});
 
     // groovy - seems unused
     // todo attributes for io.jmix.reports.entity.charts.AbstractChartDescription

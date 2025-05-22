@@ -6,9 +6,14 @@ import com.company.library.reports.api.DefaultValueProvider;
 import com.company.library.reports.api.FetchPlanProvider;
 import com.company.library.reports.api.ParameterTransformer;
 import com.company.library.reports.api.ParameterValidator;
-import io.jmix.core.*;
+import io.jmix.core.DataManager;
+import io.jmix.core.FetchPlans;
+import io.jmix.core.Messages;
 import io.jmix.core.querycondition.PropertyCondition;
-import io.jmix.reports.entity.*;
+import io.jmix.reports.entity.DataSetType;
+import io.jmix.reports.entity.Orientation;
+import io.jmix.reports.entity.ParameterType;
+import io.jmix.reports.entity.ReportOutputType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,30 +23,65 @@ import java.util.List;
         code = "BOOK_ITEMS_LOCATION",
         group = DemoReportGroup.class
 )
-public interface BooksItemLocationReport {
+@InputParameterDef(
+        alias = "entities",
+        name = "Entities",
+        type = ParameterType.ENTITY_LIST,
+        required = true,
+        entity = @EntityParameterDef(entityClass = BookInstance.class)
+)
+@BandDef(
+        name = "Root",
+        root = true,
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "headerBookInstances",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL
+)
+@BandDef(
+        name = "BookInstances",
+        parent = "Root",
+        orientation = Orientation.HORIZONTAL,
+        dataSets = @DataSetDef(
+                name = "BookInstances",
+                type = DataSetType.MULTI,
+                entity = @EntityDataSetDef(
+                        listParameterAlias = "entities"
+                )
+        )
+)
+@TemplateDef(
+        code = "default",
+        outputType = ReportOutputType.XLSX,
+        filePath = "com/company/library/reports/new/BookItemsLocation.xlsx",
+        isDefault = true,
+        outputNamePattern = "Book Items location.xlsx"
+)
+public class BooksItemLocationReport {
+    private final Messages messages;
+    private final DataManager dataManager;
+    private final FetchPlans fetchPlans;
 
-    @InputParameterDef(
-            alias = "entities",
-            name = "Entities",
-            type = ParameterType.ENTITY_LIST,
-            required = true,
-            entityParameters = @EntityParameterDef(entityClass = BookInstance.class)
-    )
-    void entitiesInputParameter();
+    public BooksItemLocationReport(Messages messages, DataManager dataManager, FetchPlans fetchPlans) {
+        this.messages = messages;
+        this.dataManager = dataManager;
+        this.fetchPlans = fetchPlans;
+    }
 
     @RelatesTo(inputParameter = "entities")
-    default ParameterValidator<List<BookInstance>> validateEntities() {
-        return (value, errorConsumer, applicationContext) -> {
+    public ParameterValidator<List<BookInstance>> validateEntities() {
+        return (value, errorConsumer) -> {
             if (value.size() > 1000) {
-                Messages messages = applicationContext.getBean(Messages.class);
                 errorConsumer.addError(messages.getMessage("report.booksItemLocation.entities.tooBig"));
             }
         };
     }
 
     @RelatesTo(inputParameter = "entities")
-    default ParameterTransformer<List<BookInstance>> transformEntities() {
-        return (value, params, applicationContext) -> {
+    public ParameterTransformer<List<BookInstance>> transformEntities() {
+        return (value, params) -> {
             return value.stream()
                     .sorted(Comparator.comparing(BookInstance::getInventoryNumber))
                     .toList();
@@ -49,9 +89,8 @@ public interface BooksItemLocationReport {
     }
 
     @RelatesTo(inputParameter = "entities")
-    default DefaultValueProvider<List<BookInstance>> defaultValueEntities() {
-        return applicationContext -> {
-            DataManager dataManager = applicationContext.getBean(DataManager.class);
+    public DefaultValueProvider<List<BookInstance>> defaultValueEntities() {
+        return () -> {
             return List.of(
                     dataManager.load(BookInstance.class)
                             .condition(PropertyCondition.create("inventoryNumber", PropertyCondition.Operation.EQUAL, 155L))
@@ -63,44 +102,17 @@ public interface BooksItemLocationReport {
         };
     }
 
-    // maybe make implicit?
-    @BandDef(name = "Root", root = true, orientation = Orientation.HORIZONTAL)
-    void rootBand();
-
-    @BandDef(name = "headerBookInstances", parent = "Root", orientation = Orientation.HORIZONTAL)
-    void headerBookInstancesBand();
-
-    @BandDef(name = "BookInstances", parent = "Root", orientation = Orientation.HORIZONTAL)
-    @DataSetDef(
-            name = "BookInstances",
-            type = DataSetType.MULTI,
-            entity = @EntityDataSetParameters(
-                    listParameterAlias = "entities"
-            )
-    )
-    void bookInstancesBand();
-
     @RelatesTo(dataSet = "BookInstances")
-    default FetchPlanProvider bookInstancesFetchPlan() {
-        return applicationContext -> {
-            return applicationContext.getBean(FetchPlans.class).builder(BookInstance.class)
-                    .add("bookPublication", publication -> {
-                        publication.add("book", book -> {
-                            book.add("name");
-                        });
-                    })
-                    .add("libraryDepartment", department -> {
-                        department.add("name");
-                    })
-                    .build();
-        };
+    public FetchPlanProvider bookInstancesFetchPlan() {
+        return () -> fetchPlans.builder(BookInstance.class)
+                .add("bookPublication", publication -> {
+                    publication.add("book", book -> {
+                        book.add("name");
+                    });
+                })
+                .add("libraryDepartment", department -> {
+                    department.add("name");
+                })
+                .build();
     }
-
-    @TemplateDef(
-            outputType = ReportOutputType.XLSX,
-            filePath = "com/company/library/reports/new/BookItemsLocation.xlsx",
-            isDefault = true,
-            outputNamePattern = "Book Items location.xlsx"
-    )
-    void defaultTemplate();
 }

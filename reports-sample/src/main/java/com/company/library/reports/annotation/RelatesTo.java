@@ -13,4 +13,6 @@ public @interface RelatesTo {
     String dataSet() default "";
 
     String template() default "";
+
+    String valueFormat() default "";
 }
