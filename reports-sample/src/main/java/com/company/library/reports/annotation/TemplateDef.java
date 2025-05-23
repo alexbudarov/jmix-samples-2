@@ -33,6 +33,7 @@ public @interface TemplateDef {
     TemplateTableDef table() default @TemplateTableDef(bands = {});
 
     // groovy - seems unused
-    // todo attributes for io.jmix.reports.entity.charts.AbstractChartDescription
-    // todo attributes for io.jmix.reports.entity.pivottable.PivotTableDescription
+
+    // Chart attributes (AbstractChartDescription) - it's not supported yet in Jmix 2
+    // PivotTable attributes (PivotTableDescription) - it's not supported yet in Jmix 2
 }
