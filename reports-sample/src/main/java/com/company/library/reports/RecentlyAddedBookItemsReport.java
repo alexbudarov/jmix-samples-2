@@ -2,11 +2,14 @@ package com.company.library.reports;
 
 import com.company.library.reports.annotation.*;
 import com.company.library.reports.api.ParameterTransformer;
+import com.company.library.reports.api.ParametersCrossValidator;
 import io.jmix.reports.entity.DataSetType;
 import io.jmix.reports.entity.Orientation;
 import io.jmix.reports.entity.ParameterType;
 import io.jmix.reports.entity.ReportOutputType;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.Date;
 
@@ -60,5 +63,17 @@ public class RecentlyAddedBookItemsReport {
     @RelatesTo(inputParameter = "createDt")
     public ParameterTransformer<Date> createDtTransform() {
         return (value, params) -> value.toInstant().atOffset(ZoneOffset.UTC);
+    }
+
+    // cross validation example.
+    // Do we need any annotation at all here? maybe @RelatesTo(report = true) ?
+    public ParametersCrossValidator crossValidator() throws ParseException {
+        Date border = new SimpleDateFormat("dd.MM.yyyy").parse("01.01.1990");
+        return (parameterValues, errorConsumer) -> {
+            Date createDt = (Date) parameterValues.get("createDt");
+            if (createDt.before(border)) {
+                errorConsumer.addError("Date is too early");
+            }
+        };
     }
 }

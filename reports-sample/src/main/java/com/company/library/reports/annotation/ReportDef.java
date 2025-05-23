@@ -47,7 +47,10 @@ public @interface ReportDef {
 
     boolean system() default false;
 
-    // todo cross-parameter validation: validationScript (with lambda),
+    // validationScript
+    // or via com.company.library.reports.api.ParametersCrossValidator
+    String crossValidationScript() default "";
+
     // validationOn - implicitly
     // isTmp, rolesIdx, screensIdx, inputEntityTypesIdx, xml - not necessary here
 
