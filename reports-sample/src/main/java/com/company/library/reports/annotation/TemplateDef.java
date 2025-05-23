@@ -1,5 +1,6 @@
 package com.company.library.reports.annotation;
 
+import com.company.library.reports.api.HtmlTemplateType;
 import io.jmix.reports.entity.ReportOutputType;
 import io.jmix.reports.entity.ReportTemplate;
 
@@ -32,7 +33,9 @@ public @interface TemplateDef {
 
     TemplateTableDef table() default @TemplateTableDef(bands = {});
 
-    // groovy - seems unused
+    // groovy
+    // make enum instead of boolean like in UI
+    HtmlTemplateType htmlTemplateType() default HtmlTemplateType.FREEMARKER;
 
     // Chart attributes (AbstractChartDescription) - it's not supported yet in Jmix 2
     // PivotTable attributes (PivotTableDescription) - it's not supported yet in Jmix 2
