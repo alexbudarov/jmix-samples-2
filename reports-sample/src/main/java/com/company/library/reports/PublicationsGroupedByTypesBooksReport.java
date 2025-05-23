@@ -118,7 +118,6 @@ public class PublicationsGroupedByTypesBooksReport {
         };
     }
 
-    // method with flexible signature, instead of Groovy script
     @RelatesTo(valueFormat = "header.generated_by")
     public ValueFormatter<String> headerGeneratedByValueFormat() {
         return value -> value != null ? value.toUpperCase() : null;
