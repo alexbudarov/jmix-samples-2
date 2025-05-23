@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Component
 public @interface ReportDef {
 
-    @AliasFor(annotation = Component.class)
+    @AliasFor(annotation = Component.class, attribute = "value")
     String beanName() default "";
 
     /**

@@ -33,6 +33,6 @@ public @interface ReportGroupDef {
      */
     String uuid() default "";
 
-    @AliasFor(annotation = Component.class)
+    @AliasFor(annotation = Component.class, attribute = "value")
     String beanName() default "";
 }
