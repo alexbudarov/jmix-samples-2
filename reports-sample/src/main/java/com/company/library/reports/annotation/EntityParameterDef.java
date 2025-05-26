@@ -20,5 +20,6 @@ public @interface EntityParameterDef {
 
     String lookupWhere() default "";
 
-    String screen() default "";
+    // screen
+    String lookupViewId() default "";
 }
