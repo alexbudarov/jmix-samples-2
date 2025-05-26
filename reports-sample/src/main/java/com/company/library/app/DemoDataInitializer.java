@@ -270,6 +270,7 @@ public class DemoDataInitializer {
             importReport("Neighbourhoods.zip");
             importReport("Publication details.zip");
             importReport("Publications grouped by types and books.zip");
+            importReport("Publications by year.zip");
             importReport("Recently added book items.zip");
 
             initFlags.setReportsInitialized(true);
