@@ -14,13 +14,17 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonDataSetParameters {
 
+    // jsonSourceType
     JsonSourceType source() default JsonSourceType.GROOVY_SCRIPT;
 
-    String sourceText() default ""; // todo delete if we don't support GROOVY_SCRIPT
+    // jsonSourceText for GROOVY_SCRIPT
+    String script() default "";
 
+    // jsonSourceText for URL
     String url() default "";
 
-    String pathQuery() default "";
+    String jsonPathQuery() default "";
 
+    // jsonSourceInputParameter
     String inputParameter() default "";
 }
