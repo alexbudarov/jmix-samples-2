@@ -4,10 +4,10 @@ import com.company.library.entity.BookPicture;
 import com.company.library.view.main.MainView;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import io.jmix.core.Resources;
 import io.jmix.flowui.component.image.JmixImage;
 import io.jmix.flowui.view.*;
-
-import java.io.ByteArrayInputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route(value = "book-pictures/:id", layout = MainView.class)
 @ViewController(id = "BookPicture.detail")
@@ -17,14 +17,16 @@ public class BookPictureDetailView extends StandardDetailView<BookPicture> {
 
     @ViewComponent
     private JmixImage<Object> picture;
+    @Autowired
+    private Resources resources;
 
     @Subscribe
     public void onReady(final ReadyEvent event) {
-        if (getEditedEntity().getPicture() != null) {
+        if (getEditedEntity().getPicturePath() != null) {
             picture.setSrc(new StreamResource(
                     getEditedEntity().getBookName(),
-                    () -> new ByteArrayInputStream(getEditedEntity().getPicture())
-                    ));
+                    () -> resources.getResourceAsStream(getEditedEntity().getPicturePath())
+            ));
         }
     }
 }

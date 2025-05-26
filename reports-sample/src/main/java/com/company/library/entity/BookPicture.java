@@ -25,16 +25,15 @@ public class BookPicture {
     @NotNull
     private String bookName;
 
-    @Column(name = "PICTURE", nullable = false)
-    @NotNull
-    private byte[] picture;
+    @Column(name = "PICTURE_PATH")
+    private String picturePath;
 
-    public byte[] getPicture() {
-        return picture;
+    public String getPicturePath() {
+        return picturePath;
     }
 
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
     }
 
     public String getBookName() {

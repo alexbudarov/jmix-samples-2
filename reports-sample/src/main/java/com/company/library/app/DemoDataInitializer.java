@@ -257,15 +257,15 @@ public class DemoDataInitializer {
     private void initBookPictures() {
         BookPicture bookPicture1 = dataManager.create(BookPicture.class);
         bookPicture1.setBookName("The Lost Science of Compound Interest");
-        bookPicture1.setPicture(readBytes("com/company/library/images/lost-science.jpg"));
+        bookPicture1.setPicturePath("com/company/library/images/lost-science.jpg");
 
         BookPicture bookPicture2 = dataManager.create(BookPicture.class);
         bookPicture2.setBookName("The 20th Century Art Book");
-        bookPicture2.setPicture(readBytes("com/company/library/images/20century.jpg"));
+        bookPicture2.setPicturePath("com/company/library/images/20century.jpg");
 
         BookPicture bookPicture3 = dataManager.create(BookPicture.class);
         bookPicture3.setBookName("Stewardship Choosing Service Over Self-Interest");
-        bookPicture3.setPicture(readBytes("com/company/library/images/stewardship.jpg"));
+        bookPicture3.setPicturePath("com/company/library/images/stewardship.jpg");
 
         dataManager.save(bookPicture1, bookPicture2, bookPicture3);
     }
@@ -290,6 +290,7 @@ public class DemoDataInitializer {
                 });
 
         if (!Boolean.TRUE.equals(initFlags.getReportsInitialized())) {
+            importReport("All Books.zip");
             importReport("Authors info.zip");
             importReport("Book Items location.zip");
             importReport("Book Record.zip");

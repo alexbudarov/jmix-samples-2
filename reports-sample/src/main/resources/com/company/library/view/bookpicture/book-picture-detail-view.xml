@@ -23,7 +23,7 @@
                 <responsiveStep minWidth="40em" columns="2"/>
             </responsiveSteps>
             <textField id="bookNameField" property="bookName"/>
-            <fileUploadField id="pictureField" clearButtonVisible="true" fileNameVisible="true" property="picture"/>
+            <textField id="picturePathField" property="picturePath"/>
             <image id="picture" maxHeight="20em" maxWidth="20em"/>
         </formLayout>
         <hbox id="detailActions">

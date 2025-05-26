@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
+<head>
+    <title> All Books </title>
+    <style type="text/css">
+        body  {font-family: 'Charis SIL', sans-serif;}
+tbody tr {height:20px; min-height:20px}
+
+    </style>
+</head>
+<body>
+
+<#assign Books = Root.bands.Books><br/>
+<#setting boolean_format="True,False">
+
+<table class="report-table" border="1" cellspacing="0" >
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Genre</th>
+        <th>Cover</th>
+    </tr>
+    </thead>
+    <tbody>
+    <#if Books?has_content>
+    <#list Books as row>
+    <tr>
+        <td> ${(row.fields('name'))!?string!} </td>
+        <td> ${(row.fields('literatureType.name'))!?string!} </td>
+        <td>
+            <#if row.fields('picturePath')?has_content>
+            <img alt="${row.fields('name')!?string!}.jpg"
+                 src="resource://${row.fields('picturePath')}"
+                 width="15em"
+                 height="15em"/>
+        </#if>
+        </td>
+    </tr>
+    </#list>
+</#if>
+</tbody>
+</table>
+
+
+</body>
+</html>
