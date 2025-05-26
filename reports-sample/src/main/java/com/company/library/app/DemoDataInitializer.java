@@ -264,7 +264,7 @@ public class DemoDataInitializer {
                 });
 
         if (!Boolean.TRUE.equals(initFlags.getReportsInitialized())) {
-            importReport("Authors Info.zip");
+            importReport("Authors info.zip");
             importReport("Book Items location.zip");
             importReport("Book Record.zip");
             importReport("Neighbourhoods.zip");
