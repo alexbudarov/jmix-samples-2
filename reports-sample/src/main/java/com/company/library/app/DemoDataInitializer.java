@@ -3,6 +3,7 @@ package com.company.library.app;
 import com.company.library.entity.*;
 import io.jmix.core.DataManager;
 import io.jmix.core.Resources;
+import io.jmix.core.SaveContext;
 import io.jmix.core.security.Authenticated;
 import io.jmix.reports.ReportImportExport;
 import jakarta.persistence.LockModeType;
@@ -45,6 +46,7 @@ public class DemoDataInitializer {
         List<Book> books = initBooks(types);
         List<BookPublication> publications = initBookPublications(books,publishers,cities);
         List<BookInstance> bookInstances = initBookInstances(publications,departments);
+        initBookPictures();
         importReport();
     }
 
@@ -250,6 +252,30 @@ public class DemoDataInitializer {
         list.add(dataManager.save(bookInstance));
 
         return list;
+    }
+
+    private void initBookPictures() {
+        BookPicture bookPicture1 = dataManager.create(BookPicture.class);
+        bookPicture1.setBookName("The Lost Science of Compound Interest");
+        bookPicture1.setPicture(readBytes("com/company/library/images/lost-science.jpg"));
+
+        BookPicture bookPicture2 = dataManager.create(BookPicture.class);
+        bookPicture2.setBookName("The 20th Century Art Book");
+        bookPicture2.setPicture(readBytes("com/company/library/images/20century.jpg"));
+
+        BookPicture bookPicture3 = dataManager.create(BookPicture.class);
+        bookPicture3.setBookName("Stewardship Choosing Service Over Self-Interest");
+        bookPicture3.setPicture(readBytes("com/company/library/images/stewardship.jpg"));
+
+        dataManager.save(bookPicture1, bookPicture2, bookPicture3);
+    }
+
+    private byte[] readBytes(String resourcePath) {
+        try (InputStream stream = resources.getResourceAsStream(resourcePath)) {
+            return IOUtils.toByteArray(stream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void importReport(){

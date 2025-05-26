@@ -15,6 +15,7 @@
         <item view="BookPublication.list"
               title="msg://com.company.library.view.bookpublication/bookPublicationListView.title"/>
         <item view="RunReportView" title="msg://com.company.library.view.runreport/runReportView.title"/>
+        <item view="BookPicture.list" title="msg://com.company.library.view.bookpicture/bookPictureListView.title"/>
     </menu>
 
 </menu-config>
