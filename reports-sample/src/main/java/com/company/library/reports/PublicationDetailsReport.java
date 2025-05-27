@@ -65,7 +65,7 @@ public class PublicationDetailsReport {
         this.fetchPlans = fetchPlans;
     }
 
-    @RelatesTo(dataSet = "BookPublication")
+    @DataSetDelegate(name = "BookPublication")
     public FetchPlanProvider bookPublicationFetchPlan() {
         return () -> fetchPlans.builder(BookPublication.class)
                 .add("year")

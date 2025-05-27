@@ -77,7 +77,7 @@ public class BookRecordReport {
         this.resourceLoader = resourceLoader;
     }
 
-    @RelatesTo(dataSet = "title")
+    @DataSetDelegate(name = "title")
     public DataSetDataLoader titleDataLoader() {
         return (parameters, parentBand) -> {
             Book book = (Book) parameters.get("entity");
@@ -90,7 +90,7 @@ public class BookRecordReport {
         };
     }
 
-    @RelatesTo(dataSet = "Book1")
+    @DataSetDelegate(name = "Book1")
     public FetchPlanProvider book1FetchPlan() {
         return () -> fetchPlans.builder(Book.class)
                 .add("name")
@@ -101,7 +101,7 @@ public class BookRecordReport {
                 .build();
     }
 
-    @RelatesTo(dataSet = "Authors2")
+    @DataSetDelegate(name = "Authors2")
     public FetchPlanProvider authors2FetchPlan() {
         // !!! we specify fetch plan for Book, not for nested authors
         return () -> fetchPlans.builder(Book.class)
@@ -113,7 +113,7 @@ public class BookRecordReport {
     }
 
     // example of custom factory method for report template
-    @RelatesTo(template = "DEFAULT")
+    @TemplateDelegate(code = "DEFAULT")
     public Factory<ReportTemplate> defaultTemplate() {
         return () -> {
             ReportTemplate t = dataManager.create(ReportTemplate.class);

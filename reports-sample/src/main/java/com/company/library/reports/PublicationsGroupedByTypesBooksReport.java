@@ -104,7 +104,7 @@ public class PublicationsGroupedByTypesBooksReport {
         this.timeSource = timeSource;
     }
 
-    @RelatesTo(dataSet = "header")
+    @DataSetDelegate(name = "header")
     public DataSetDataLoader headerImplementation() {
         return (parameters, parentBand) -> {
             String user = currentAuthentication.getUser().getUsername();
@@ -118,7 +118,7 @@ public class PublicationsGroupedByTypesBooksReport {
         };
     }
 
-    @RelatesTo(valueFormat = "header.generated_by")
+    @ValueFormatDelegate(band = "header", field = "generated_by")
     public ValueFormatter<String> headerGeneratedByValueFormat() {
         return value -> value != null ? value.toUpperCase() : null;
     }

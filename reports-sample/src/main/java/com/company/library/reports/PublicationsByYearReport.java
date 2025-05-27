@@ -59,7 +59,7 @@ import java.util.Map;
 )
 public class PublicationsByYearReport {
 
-    @RelatesTo(template = "XML")
+    @TemplateDelegate(code = "XML")
     public CustomReport customTemplate() {
         return (report, rootBand, params) -> {
             return renderXml(rootBand);

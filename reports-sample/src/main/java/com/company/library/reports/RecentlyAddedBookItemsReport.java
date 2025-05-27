@@ -60,13 +60,13 @@ import java.util.Date;
 )
 public class RecentlyAddedBookItemsReport {
 
-    @RelatesTo(inputParameter = "createDt")
+    @InputParameterDelegate(alias = "createDt")
     public ParameterTransformer<Date> createDtTransform() {
         return (value, params) -> value.toInstant().atOffset(ZoneOffset.UTC);
     }
 
     // cross validation example.
-    // Do we need any annotation at all here? maybe @RelatesTo(report = true) ?
+    @ReportDelegate
     public ParametersCrossValidator crossValidator() throws ParseException {
         Date border = new SimpleDateFormat("dd.MM.yyyy").parse("01.01.1990");
         return (parameterValues, errorConsumer) -> {

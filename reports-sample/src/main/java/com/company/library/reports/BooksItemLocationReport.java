@@ -70,7 +70,7 @@ public class BooksItemLocationReport {
         this.fetchPlans = fetchPlans;
     }
 
-    @RelatesTo(inputParameter = "entities")
+    @InputParameterDelegate(alias = "entities")
     public ParameterValidator<List<BookInstance>> validateEntities() {
         return (value, errorConsumer) -> {
             if (value.size() > 1000) {
@@ -79,7 +79,7 @@ public class BooksItemLocationReport {
         };
     }
 
-    @RelatesTo(inputParameter = "entities")
+    @InputParameterDelegate(alias = "entities")
     public ParameterTransformer<List<BookInstance>> transformEntities() {
         return (value, params) -> {
             return value.stream()
@@ -88,7 +88,7 @@ public class BooksItemLocationReport {
         };
     }
 
-    @RelatesTo(inputParameter = "entities")
+    @InputParameterDelegate(alias = "entities")
     public DefaultValueProvider<List<BookInstance>> defaultValueEntities() {
         return () -> {
             return List.of(
@@ -102,7 +102,7 @@ public class BooksItemLocationReport {
         };
     }
 
-    @RelatesTo(dataSet = "BookInstances")
+    @DataSetDelegate(name = "BookInstances")
     public FetchPlanProvider bookInstancesFetchPlan() {
         return () -> fetchPlans.builder(BookInstance.class)
                 .add("bookPublication", publication -> {
