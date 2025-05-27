@@ -270,14 +270,6 @@ public class DemoDataInitializer {
         dataManager.save(bookPicture1, bookPicture2, bookPicture3);
     }
 
-    private byte[] readBytes(String resourcePath) {
-        try (InputStream stream = resources.getResourceAsStream(resourcePath)) {
-            return IOUtils.toByteArray(stream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private void importReport(){
         InitFlags initFlags = dataManager.load(InitFlags.class)
                 .id(1)
